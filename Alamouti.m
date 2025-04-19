@@ -10,8 +10,6 @@ P = 4; % độ dài điều chế QPSK
 
 % Khởi tạo mảng lưu trữ BER
 BERMRC = zeros(1, length(EbN0)); % BER cho MRC
-BERML = zeros(1, length(EbN0)); % BER cho ML
-errorMRC = zeros(1, numPackets); % Lỗi cho MRC
 errorML = zeros(1, numPackets); % Lỗi cho ML
 
 % Vòng lặp cho Eb/N0 điểm
