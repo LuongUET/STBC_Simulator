@@ -1,0 +1,58 @@
+clear all
+SNRdb=[0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40];  
+k=1000;
+%The graph will be drawn using different SNR values.
+for i=1:length(SNRdb)                                                                     %The Program will continue computing for these different values. 
+    sigma=sqrt(10^(-SNRdb(i)/10));                                                              %N0 variance of the noise will be computed.
+    Ber2(i)=0;
+    
+    for run=1:10000    
+        %The choose of 'run' value is 
+s0=(sign(randn(1,k)))./sqrt(2);
+s1=(sign(randn(1,k)))./sqrt(2);
+
+      H0=((randn(1,k))+j*(randn(1,k)))./sqrt(2);
+    H1=((randn(1,k))+j*(randn(1,k)))./sqrt(2);
+    H2=((randn(1,k))+j*(randn(1,k)))./sqrt(2);
+    H3=((randn(1,k))+j*(randn(1,k)))./sqrt(2);
+
+    N0=(sigma*((randn(1,k))+j*(randn(1,k))))./sqrt(2);
+    N1=(sigma*((randn(1,k))+j*(randn(1,k))))./sqrt(2);
+    N2=(sigma*((randn(1,k))+j*(randn(1,k))))./sqrt(2);
+    N3=(sigma*((randn(1,k))+j*(randn(1,k))))./sqrt(2);
+
+    r0=H0.*s0+H1.*s1+N0;
+    r1=-H0.*conj(s1)+H1.*conj(s0)+N1;
+    r2=H2.*s0+H3.*s1+N2;
+    r3=-H2.*conj(s1)+H3.*conj(s0)+N3;
+
+    
+    
+    %ML
+    Shat1=conj(H0).*r0+H1.*conj(r1)+conj(H2).*r2+H3.*conj(r3);
+    Shat2=conj(H1).*r0-H0.*conj(r1)+conj(H3).*r2-H2.*conj(r3);
+
+
+    S0hat=sign(real(Shat1))./sqrt(2);
+  
+    
+    S00hat=sign(real(Shat2))./sqrt(2);
+  
+
+    
+    
+    
+    Error1=(sum(s0~=S0hat));
+    Error2=(sum(s1~=S00hat));
+    Ber2(i)=Ber2(i)+(Error1+Error2)./(2*k);
+    
+     
+    
+    
+    
+    end
+end
+Ber2=Ber2/run;
+ 
+ semilogy(SNRdb,Ber2,'bo-','LineWidth',2);
+xlabel('E_b/N_0 (dB)');ylabel('BER (P_e)');grid;

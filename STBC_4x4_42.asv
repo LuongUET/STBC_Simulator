@@ -1,6 +1,6 @@
 clear all; close all; clc;
-frmLen = 1e4; % chiều dài frame
-numPackets = 100; % số lượng packet
+frmLen = 1e6; % chiều dài frame
+numPackets = 1000; % số lượng packet
 EbN0 = 0:0.5:10; % giá trị Eb/N0 từ 0 đến 20 dB, bước 2 dB
 N = 4; % số lượng anten Tx
 M = 4; % số lượng anten thu Rx

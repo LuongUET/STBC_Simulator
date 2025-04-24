@@ -1,8 +1,8 @@
 clear all; close all; clc;
 
-frmLen = 100; % chiều dài frame (số ký hiệu)
+frmLen = 1000; % chiều dài frame (số ký hiệu)
 numPackets = 1000; % số lượng packet
-EbN0 = 0:2:16; % giá trị Eb/N0 từ 0 đến 20 dB, bước 2 dB
+EbN0 = 0:2:20; % giá trị Eb/N0 từ 0 đến 20 dB, bước 2 dB
 N = 2; % số lượng anten Tx (cho Alamouti)
 M = 1; % số lượng anten thu Rx
 P = 4; % độ dài điều chế QPSK
@@ -81,8 +81,8 @@ for idx = 1:length(EbN0)
             Hr = (randn(frmLen, N, 4) + 1i*randn(frmLen, N, 4)) / sqrt(2); % 2 kênh
             h1 = reshape(Hr(:,:,1), frmLen, N); % 1x2
             h2 = reshape(Hr(:,:,2), frmLen, N); % 1x2
-            h3 = reshape(Hr(:,:,3), frmLen, N); 
-            h4 = reshape(Hr(:,:,4), frmLen, N); %
+            h2 = reshape(Hr(:,:,3), frmLen, N); % 1x2
+            h2 = reshape(Hr(:,:,4), frmLen, N); %
 
             % Nhiễu AWGN
             Es = 1; % Công suất ký hiệu
@@ -91,18 +91,13 @@ for idx = 1:length(EbN0)
             noise = sqrt(N0/2) * (randn(frmLen, N) + 1i*randn(frmLen, N));
     
             % Tín hiệu thu
-%            r1 = h1.*s1 + h2.*s2 + noise; % Thời điểm 1
-%            r2 = h1.*(-conj(s2)) + h2.*conj(s1) + noise; % Thời điểm 2
-%            r3 = h3.*s1 + h4.*s2 + noise;
-%            r4 = h3.*(-conj(s2)) + h4.*conj(s1) + noise;
-
-           r1 = awgn(h1.*s1 + h2.*s2, EbN0(idx) + 3, 'measured'); % Thêm nhiễu (QPSK: Es/N0 = Eb/N0 + 3 dB)
-           r2 = awgn(h1.*(-conj(s2)) + h2.*conj(s1), EbN0(idx) + 3, 'measured');
-           r3 = awgn(h3.*s1 + h4.*s2, EbN0(idx) + 3, 'measured');
-           r4 = awgn(h3.*(-conj(s2)) + h4.*conj(s1), EbN0(idx) + 3, 'measured');
+            r1 = h1.*s1 + h2.*s2 + noise; % Thời điểm 1
+            r2 = h1.*(-conj(s2)) + h2.*conj(s1) + noise; % Thời điểm 2
+            r3 = h3.*s1 + h4.*s2 + noise
+            r4 = h3.*(-conj(s2)) + h4.*conj(s1) + noise
             % Giải mã Alamouti
             z1 = conj(h1).*r1+h2.*conj(r2)+conj(h3).*r3+h4.*conj(r4);
-            z2 = conj(h2).*r1-h1.*conj(r2)+conj(h4).*r3-h3.*conj(r4);
+            z2 = conj(h2).*r1-h1.*conj(r2)+conj(h3).*r3+h4.*conj(r4);
             
             z(:,1) = sum(z1,2);
             z(:,2) = sum(z2,2);
@@ -115,7 +110,7 @@ for idx = 1:length(EbN0)
     BERMRC21(idx) = sum(errorAla21) / (numPackets * frmLen * 2 * 2); % Alamouti: 2 cột dữ liệu
     BERMRC22(idx) = sum(errorAla22) / (numPackets * frmLen * log2(P));
     BERSISO(idx) = sum(errorSISO) / (numPackets * frmLen * 2); % SISO: 1 cột dữ liệu
-    fprintf('Eb/N0 = %d dB, BER Alamouti 2x1 = %e, BER Alamouti 2x2 = %e, BER SISO = %e\n', EbN0(idx), BERMRC21(idx), BERMRC22(idx),BERSISO(idx));
+    fprintf('Eb/N0 = %d dB, BER Alamouti = %e, BER SISO = %e, BER SISO = %e\n', EbN0(idx), BERMRC21(idx), BERMRC22(idx),BERSISO(idx));
 end
 
 % Vẽ đồ thị
